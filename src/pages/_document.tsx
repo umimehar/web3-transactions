@@ -1,5 +1,5 @@
-import { Html, Head, Main, NextScript } from 'next/document'
-import {Body} from "@/components/html/body";
+import { Html, Head, Main, NextScript } from "next/document";
+import { Body } from "@/components/Html/Body";
 
 export default function Document() {
   return (
@@ -10,5 +10,5 @@ export default function Document() {
         <NextScript />
       </Body>
     </Html>
-  )
+  );
 }
