@@ -2,7 +2,8 @@ import { ChainIds } from "@/utils/chains";
 
 export const NetworkMetadata = {
   [ChainIds.MAINNET]: {
-    chainId: "0x1",
+    id: "0x1",
+    chainId: ChainIds.MAINNET,
     chainName: "Ethereum",
     nativeCurrency: {
       name: "Ethereum",
@@ -22,7 +23,8 @@ export const NetworkMetadata = {
   //   blockExplorerUrls: ["https://goerli.etherscan.io"],
   // },
   [ChainIds.POLYGON]: {
-    chainId: "0x89",
+    id: "0x89",
+    chainId: ChainIds.POLYGON,
     chainName: "Polygon",
     nativeCurrency: {
       name: "MATIC",
