@@ -24,6 +24,7 @@ import format from "date-fns/format";
 import { Web3 } from "web3";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { Tooltip } from "react-tooltip";
+import { ChainIds } from "@/utils/chains";
 
 const latoFonts = Lato({ weight: "400", subsets: ["latin"] });
 export default function Transaction() {
@@ -214,6 +215,23 @@ export default function Transaction() {
                 <div className="flex gap-2 w-full md:w-4/6 ">
                   <div className="break-all">{data.from}</div>
                   <ClipboardCopy className="w-6 md:w-3" value={data.from} />
+                </div>
+              </div>
+
+              <div className="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+
+              <div className="flex flex-col md:flex-row">
+                <div className="w-full md:w-2/6 text-gray-800 dark:text-gray-300">
+                  Block explorer url
+                </div>
+                <div className="flex gap-2 w-full md:w-4/6 ">
+                  <Link
+                    href={`${networkMetaData.blockExplorerUrls[0]}/tx/${tx_hash}`}
+                    target={"_blank"}
+                  >
+                    {chainId === ChainIds.MAINNET ? "Etherscan" : "Polygonscan"}{" "}
+                    Link
+                  </Link>
                 </div>
               </div>
             </div>
