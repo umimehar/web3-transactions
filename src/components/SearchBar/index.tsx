@@ -1,7 +1,7 @@
-import { ComponentProps, useCallback, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { isValidAddress } from "@/utils/util-funcs";
+import { ChainIds } from "@/utils/chains";
 
 type Input = {
   address: string;
@@ -10,8 +10,13 @@ type Input = {
 interface SearchBarProps {
   onSubmit: (data: Input) => Promise<void>;
   defaultValue?: string;
+  chainId?: number;
 }
-export const SearchBar = ({ onSubmit, defaultValue }: SearchBarProps) => {
+export const SearchBar = ({
+  onSubmit,
+  defaultValue,
+  chainId,
+}: SearchBarProps) => {
   const {
     register,
     handleSubmit,
@@ -84,9 +89,13 @@ export const SearchBar = ({ onSubmit, defaultValue }: SearchBarProps) => {
               : errors.address && "Address is invalid."}
           </div>
         ) : (
-          <div className={"text-gray-900"}>
-            Click on search to get transactions
-          </div>
+          <>
+            <div className="text-sm text-gray-900 dark:text-gray-400 w-full">
+              {chainId === ChainIds.POLYGON
+                ? "Use 0x0b186dbb33b6e36107c5ef4f595ee16076e8618d on Polygon."
+                : "Use 0xe8bdcdc4c8c05245a68410351293cda30980ab49 on Ethereum."}
+            </div>
+          </>
         )}
       </div>
     </form>

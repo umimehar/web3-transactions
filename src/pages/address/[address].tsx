@@ -94,6 +94,7 @@ export default function Address() {
                 onSubmit={async (e) => {
                   await handleSearch(e);
                 }}
+                chainId={chainId}
               />
             </div>
           </div>
@@ -137,6 +138,13 @@ export default function Address() {
               </div>
             </div>
           </TableSkeleton>
+
+          {transactionsData?.data &&
+            transactionsData.data.result.length === 0 && (
+              <div className="text-2xl p-10 flex items-center justify-center">
+                No transaction found.
+              </div>
+            )}
         </div>
       </main>
     </>
