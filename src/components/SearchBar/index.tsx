@@ -1,14 +1,14 @@
 import { ComponentProps, useCallback, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
-import { isValidAddress } from "@/utils/is-valid-address";
+import { isValidAddress } from "@/utils/util-funcs";
 
 type Input = {
   address: string;
 };
 
 interface SearchBarProps {
-  onSubmit: (data: Input) => void;
+  onSubmit: (data: Input) => Promise<void>;
   defaultValue?: string;
 }
 export const SearchBar = ({ onSubmit, defaultValue }: SearchBarProps) => {
@@ -16,12 +16,14 @@ export const SearchBar = ({ onSubmit, defaultValue }: SearchBarProps) => {
     register,
     handleSubmit,
     formState: { errors, isValid },
+    reset,
   } = useForm<Input>();
 
   return (
     <form
-      onSubmit={handleSubmit((data) => {
-        onSubmit && onSubmit(data);
+      onSubmit={handleSubmit(async (data) => {
+        onSubmit && (await onSubmit(data));
+        reset();
       })}
       className={"w-full"}
     >
@@ -53,7 +55,7 @@ export const SearchBar = ({ onSubmit, defaultValue }: SearchBarProps) => {
           defaultValue={defaultValue}
           type="search"
           id="default-search"
-          className="block w-full font-medium p-4 pl-10 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="block w-full text-sm md:text-md font-medium p-4 pl-8 md:pl-10 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="Search..."
           {...register("address", {
             required: true,
@@ -65,20 +67,27 @@ export const SearchBar = ({ onSubmit, defaultValue }: SearchBarProps) => {
         <button
           type="submit"
           className={twMerge(
-            "absolute right-2.5 bottom-2.5 font-medium rounded-lg text-sm px-4 py-2 ",
-            isValid &&
-              "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
-            !isValid && "bg-gray-300 text-gray-500 cursor-not-allowed",
+            "absolute right-2.5 bottom-3 md:bottom-2.5 font-medium rounded-lg text-sm px-2 py-1 md:px-4 md:py-2 ",
+            "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
+            // !isValid && "bg-gray-300 text-gray-500 cursor-not-allowed",
           )}
-          disabled={!isValid}
+          // disabled={!isValid}
         >
           Search
         </button>
       </div>
-      <div className="mt-1 text-sm text-black dark:text-red-400">
-        {errors.address && errors.address.type === "required"
-          ? "Address is required."
-          : errors.address && "Address is invalid."}
+      <div className="mt-1 text-sm text-black h-6 font-bold">
+        {errors.address ? (
+          <div className={"dark:text-red-400 text-red-600"}>
+            {errors.address.type === "required"
+              ? "Address is required."
+              : errors.address && "Address is invalid."}
+          </div>
+        ) : (
+          <div className={"text-gray-900"}>
+            Click on search to get transactions
+          </div>
+        )}
       </div>
     </form>
   );

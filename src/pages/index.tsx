@@ -52,8 +52,10 @@ export default function Home() {
                 </div>
               </div>
               <SearchBar
-                onSubmit={(e) => {
-                  handleSearch(e);
+                // defaultValue={'0x0b186dbb33b6e36107c5ef4f595ee16076e8618d'} // polygon
+                defaultValue="0xe8bdcdc4c8c05245a68410351293cda30980ab49"
+                onSubmit={async (e) => {
+                  await handleSearch(e);
                 }}
               />
             </div>

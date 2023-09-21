@@ -7,32 +7,62 @@ import { NetworkMetadata } from "@/utils/network-metadata";
 import { useCallback, useEffect } from "react";
 import { useChainId } from "@/hooks/chainId";
 import { useRouter } from "next/router";
-import { isValidAddress } from "@/utils/is-valid-address";
+import { isValidAddress } from "@/utils/util-funcs";
+import { TableSkeleton } from "@/components/Skeleton/TableSkeleton";
+import { TransactionsSection } from "@/components/Transactions/TransactionsSection";
+import { useGetTransactions } from "@/hooks/api/useGetTransactions";
+import Link from "next/link";
 
 const latoFonts = Lato({ weight: "400", subsets: ["latin"] });
 export default function Address() {
   const router = useRouter();
   const { chainId, setChainId } = useChainId();
+  const {
+    address,
+    page = "1",
+    offset = "10",
+  } = router.query as {
+    address: string;
+    page: string;
+    offset: string;
+  };
+
+  const {
+    isLoading,
+    data: transactionsData,
+    error,
+    refetch,
+  } = useGetTransactions(
+    { address, chainId: String(chainId), page, offset },
+    { enabled: !!chainId && !!address },
+  );
 
   useEffect(() => {
     // redirect to home page if invalid address
-    const { address } = router.query;
-    if (!(address && isValidAddress(address as string))) {
-      router.push("/", undefined, { shallow: true }).then();
+    if (address && !isValidAddress(address)) {
+      router.push("/");
       return;
     }
-  }, [router]);
+  }, [address, router]);
+
+  useEffect(() => {
+    if (!address) {
+      return;
+    }
+    // only fetch is there is address
+    refetch().then();
+  }, [address, refetch, router]);
 
   const handleSearch = useCallback(
-    (e: Record<string, any>) => {
-      console.log(e, chainId, "asdf");
+    async (e: Record<string, any>) => {
+      await router.push(`/address/${e.address}`);
     },
-    [chainId],
+    [address, chainId],
   );
 
   return (
     <>
-      <HtmlHead title="Search" />
+      <HtmlHead title="Transactions" />
       <main className={`flex flex-col min-h-screen ${latoFonts.className}`}>
         <Header />
         <div className={"flex w-full justify-center items-center mt--20px"}>
@@ -60,12 +90,53 @@ export default function Address() {
                 </div>
               </div>
               <SearchBar
-                onSubmit={(e) => {
-                  handleSearch(e);
+                defaultValue={address}
+                onSubmit={async (e) => {
+                  await handleSearch(e);
                 }}
               />
             </div>
           </div>
+        </div>
+
+        <div className="w-full px-2 md:px-4 my-4">
+          <TableSkeleton loading={isLoading}>
+            {transactionsData && (
+              <TransactionsSection
+                transactionsData={transactionsData.data}
+                chainId={chainId}
+                address={address}
+              />
+            )}
+            <div className={"my-3"}>
+              <div className="flex justify-center items-center">
+                {Number(page) != 1 && (
+                  <Link
+                    href={{
+                      pathname: `./${address}`,
+                      query: { offset, page: Number(page) - 1 },
+                    }}
+                    className="flex items-center justify-center px-4 h-10 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  >
+                    Previous
+                  </Link>
+                )}
+
+                {transactionsData?.data &&
+                  transactionsData?.data.result.length >= Number(offset) && (
+                    <Link
+                      href={{
+                        pathname: `./${address}`,
+                        query: { offset, page: Number(page) + 1 },
+                      }}
+                      className="flex items-center justify-center px-4 h-10 ml-3 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    >
+                      Next
+                    </Link>
+                  )}
+              </div>
+            </div>
+          </TableSkeleton>
         </div>
       </main>
     </>
